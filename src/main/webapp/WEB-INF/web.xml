@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+                             http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+         version="4.0">
+
+    <display-name>mysns</display-name>
+
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
+
+    <!--
+      순수 JSP 구조에서는 스프링의 @ControllerAdvice 같은 전역 예외 처리기를 둘 수 없다.
+      대신 error-page 매핑으로 "처리되지 않은 예외는 항상 같은 화면으로 보낸다"는
+      일관된 예외 처리 전략을 구현한다.
+
+      error.jsp는 상세 원인을 서버 로그에만 남기고 사용자에게는 일반적인 문구만
+      보여주므로, 스택 트레이스를 통해 내부 구조가 노출되는 것을 막는다.
+    -->
+    <error-page>
+        <exception-type>exceptions.DataAccessException</exception-type>
+        <location>/error.jsp</location>
+    </error-page>
+    <error-page>
+        <exception-type>java.lang.Throwable</exception-type>
+        <location>/error.jsp</location>
+    </error-page>
+    <error-page>
+        <error-code>500</error-code>
+        <location>/error.jsp</location>
+    </error-page>
+    <error-page>
+        <error-code>404</error-code>
+        <location>/error.jsp</location>
+    </error-page>
+
+    <session-config>
+        <session-timeout>30</session-timeout>
+        <cookie-config>
+            <!-- 자바스크립트에서 세션 쿠키를 읽지 못하게 해 XSS로 인한 세션 탈취를 어렵게 한다. -->
+            <http-only>true</http-only>
+            <!-- HTTPS로 서비스할 때는 아래를 true로 켠다. -->
+            <secure>false</secure>
+        </cookie-config>
+        <tracking-mode>COOKIE</tracking-mode>
+    </session-config>
+
+</web-app>

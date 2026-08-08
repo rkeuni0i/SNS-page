@@ -1,0 +1,33 @@
+<html>
+<head>
+	<meta name=viewport content="width=device-width, initial-scale=1, user-scalable=0">
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="css/core.css">
+	<title>MySNS 회원탈퇴</title>
+	<style>
+		.desc{
+			float: left;
+			width: 100%;
+			color: #888;
+			font-size: 0.9em;
+		}
+	</style>
+</head>
+<body>
+<form method = "post" action="withdraw.jsp">
+	<div class="page-hdr">MySNS</div>
+	<div class="page-body">
+		<div class="section pad-24 mtop-30">
+			<input type="text" name="id" class="mtop-10" placeholder="아이디(이메일주소)" required>
+			<input type="submit" class="mtop-20" value="회원탈퇴하기">
+		</div>
+		<div class="scetion pad-24 mtop-30">
+			<div class="desc mtop-20 mbot-20">
+				회원 탈퇴 시 회원 정보 및 활동 내역에 모두 삭제되며, 복원이 불가능하오니 유의하시기 바랍니다.
+			</div>
+		</div>
+	</div>
+	<div class="page-footer">Copyright: mysns.com, 202x</div>
+</form>
+<body>
+</html>

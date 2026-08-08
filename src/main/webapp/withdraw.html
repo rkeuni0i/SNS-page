@@ -1,0 +1,40 @@
+<html>
+<head>
+	<meta name=viewport content="width=device-width, initial-scale=1, user-scalable=0">
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="css/core.css">
+	<title>MySNS 회원탈퇴</title>
+	<style>
+		.desc{
+			float: left;
+			width: 100%;
+			color: #888;
+			font-size: 0.9em;
+		}
+	</style>
+</head>
+<body>
+<form method="post" action="withdraw.jsp">
+	<div class="page-hdr">MySNS</div>
+	<div class="page-body">
+		<div class="section pad-24 mtop-30">
+			<!--
+				아이디 입력칸을 제거하고 비밀번호 확인칸으로 교체했습니다.
+				예전에는 아이디만 입력하면 로그인하지 않은 사람도 남의 계정을
+				삭제할 수 있었습니다. 이제 로그인한 본인이, 비밀번호를 확인한
+				뒤에만 탈퇴할 수 있습니다(withdraw.jsp 참고).
+			-->
+			<div class="desc mbot-20">본인 확인을 위해 비밀번호를 입력해 주세요.</div>
+			<input type="password" name="ps" class="mtop-10" placeholder="패스워드" required>
+			<input type="submit" class="mtop-20" value="회원탈퇴하기">
+		</div>
+		<div class="section pad-24 mtop-30">
+			<div class="desc mtop-20 mbot-20">
+				회원 탈퇴 시 회원 정보 및 활동 내역이 모두 삭제되며, 복원이 불가능하오니 유의하시기 바랍니다.
+			</div>
+		</div>
+	</div>
+	<div class="page-footer">Copyright: mysns.com, 202x</div>
+</form>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<html>
+<head>
+	<meta name=viewport content="width=device-width, initial-scale=1, user-scalable=0">
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="css/core.css">
+	<title>MySNS</title>
+	<style>
+		.pad-4 { padding: 0 4px; }
+		textarea {
+			float: left;
+			width: 100%;
+			height: 160px;
+			padding: 16px;
+			box-sizing: border-box;
+			font-size: 1.0em;
+			font-family: 'Malgun Gothic', 'Arial';
+			border: 1px solid #ddd;
+			border-radius: 4px;
+			outline: none;
+		}
+		input[type=file]{
+			padding: 0px;
+			border: none;
+			outline: none;
+			font-size: 0.95em;
+		 }
+		.desc{
+			float: left;
+			width: 100%;
+			margin-bottom: 5px;
+			font-size: 0.95em;
+			color: #888;
+		}
+	</style>
+</head>
+<body>
+	<form action="feedAdd.jsp" method="post" enctype="multipart/form-data">
+		<div class="page-hdr">MySNS</div>
+		<div class="page-body">
+			<div class="section pad-24 mtop-30">
+				<!--
+					작성자 아이디 입력칸을 제거했습니다.
+					예전에는 여기에 아무 아이디나 입력해 타인을 사칭한 글을 쓸 수 있었습니다.
+					이제 작성자는 서버가 로그인 세션에서 판단합니다(feedAdd.jsp 참고).
+				-->
+				<textarea name="content" placeholder="이곳에글을작성해주세요." required></textarea>
+				<div class="section pad-4 mtop-30">
+					<div class="desc">아래에서이미지를선택해주세요.(선택, 최대 5MB)</div>
+					<input type="file" name="image" accept="image/*">
+				</div>
+				<input type="submit" class="mtop-30" value="업로드하기">
+			</div>
+		</div>
+		<div class="page-footer">Copyright: mysns.com, 202x</div>
+	</form>
+</body>
+</html>

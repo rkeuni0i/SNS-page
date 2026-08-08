@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>
+	<!--
+		Tomcat이 관리하는 커넥션 풀(JNDI DataSource).
+		util.ConnectionPool 이 "java:comp/env/jdbc/mysns" 이름으로 이 리소스를 찾는다.
+
+		=========================================================
+		 현재 설정: MariaDB  (개발 환경에 MariaDB 11.3 설치됨)
+		=========================================================
+
+		[드라이버 JAR 위치]
+		  MariaDB Connector/J 를 받아 Tomcat 설치 폴더의 lib/ 에 넣는다.
+		    https://mariadb.com/downloads/connectors/  → "Java 8+ connector"
+		    C:\...\apache-tomcat-9.0.xx\lib\mariadb-java-client-3.x.x.jar
+		  웹앱의 WEB-INF/lib 가 아니라 반드시 Tomcat 의 lib 폴더여야 한다.
+		  컨테이너가 관리하는 리소스라 컨테이너 클래스로더가 드라이버를 봐야 하기 때문이다.
+
+		[문자셋]
+		  characterEncoding=UTF-8 이 없으면 커넥션 기본값(예: euckr, latin1)으로
+		  동작해 한글이 '?' 로 저장된다. 되돌릴 수 없는 데이터 손상이므로 반드시 유지할 것.
+
+		[커넥션 검증]
+		  DB 재시작이나 유휴 타임아웃으로 죽은 커넥션이 풀에 남는 것을 막는다.
+	-->
+	<Resource name="jdbc/mysns"
+		auth="Container"
+		type="javax.sql.DataSource"
+
+		driverClassName="org.mariadb.jdbc.Driver"
+		url="jdbc:mariadb://localhost:3306/mysns?useUnicode=true&amp;characterEncoding=UTF-8"
+		username="root"
+		password="1111"
+
+		maxTotal="16"
+		maxIdle="4"
+		maxWaitMillis="10000"
+
+		testOnBorrow="true"
+		validationQuery="SELECT 1" />
+
+	<!--
+		=========================================================
+		 MySQL 8 을 쓰는 경우: 위 Resource 를 지우고 아래 주석을 해제한다.
+		 드라이버는 MySQL Connector/J (mysql-connector-j-8.x.x.jar) 를 쓴다.
+		=========================================================
+
+	<Resource name="jdbc/mysns"
+		auth="Container"
+		type="javax.sql.DataSource"
+		driverClassName="com.mysql.cj.jdbc.Driver"
+		url="jdbc:mysql://localhost:3306/mysns?serverTimezone=Asia/Seoul&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;allowPublicKeyRetrieval=true&amp;useSSL=false"
+		username="root"
+		password="1111"
+		maxTotal="16"
+		maxIdle="4"
+		maxWaitMillis="10000"
+		testOnBorrow="true"
+		validationQuery="SELECT 1" />
+	-->
+</Context>

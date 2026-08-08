@@ -1,0 +1,37 @@
+<html>
+<head>
+	<meta name=viewport content="width=device-width, initial-scale=1, user-scalable=0">
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="css/core.css">
+	<title>MySNS 회원가입</title>
+	<style>
+		.desc{
+			float: left;
+			width: 100%;
+			color: #888;
+			font-size: 0.9em;
+			}
+	</style>
+</head>
+<body>
+<form method = "post" action="signup.jsp">
+	<div class="page-hdr">MySNS</div>
+	<div class="page-body">
+		<div class="section pad-24 mtop-30">
+			<input type="text" name="id" placeholder="아이디(이메일주소)" required>
+			<input type="password" name="ps" class="mtop-10" placeholder ="패스워드" required>
+			<input type="password" name="ps2" class="mtop-10" placeholder ="패스워드(확인)" required>
+			<input type="text" name="name" class="mtop-10" placeholder ="이름" required>
+			<input type="submit"class="mtop-20" value="회원가입하기" required>
+		</div>
+		<div class="section pad-24 mtop-30">
+			<div class="desc mtop-20 mbot-20">
+				회원 가입 시 MySNS의 약관에 동의하신 것으로 간주됩니다.
+			</div>
+			<a href=".html"><div class ="button">약관보기</div></a>
+		</div>
+		</div>
+		<div class="page-footer">Copyright: mysns.com, 202x</div>
+</form>
+<body>
+</html>
