@@ -21,24 +21,29 @@
 	<title>MySNS 가입자</title>
 </head>
 <body>
-	<div class="page-hdr">MySNS</div>
+	<div class="page-hdr"><a href="main.jsp">MySNS</a></div>
 	<div class="page-body">
-		<table align="center">
-			<tr><th colspan="3">가입자 리스트</th></tr>
+		<div class="container">
+			<h1 class="user-list-title">가입자 리스트</h1>
 <%
 	for (User user : users) {
 		String when = (user.getCreatedAt() != null) ? user.getCreatedAt().format(fmt) : "";
+		String initial = (user.getName() != null && !user.getName().isEmpty())
+				? HtmlEscaper.escape(user.getName().substring(0, 1))
+				: "?";
 %>
-			<tr><td colspan="3"><hr></td></tr>
-			<tr>
-				<td><%= HtmlEscaper.escape(user.getId()) %></td>
-				<td><%= HtmlEscaper.escape(user.getName()) %></td>
-				<td>&nbsp;<small>(<%= when %>)</small></td>
-			</tr>
+			<a class="user-row" href="profile.jsp?id=<%= java.net.URLEncoder.encode(user.getId(), "UTF-8") %>">
+				<div class="avatar"><%= initial %></div>
+				<div class="user-info">
+					<div class="user-name"><%= HtmlEscaper.escape(user.getName()) %></div>
+					<div class="user-id"><%= HtmlEscaper.escape(user.getId()) %></div>
+				</div>
+				<div class="user-joined"><%= when %></div>
+			</a>
 <%
 	}
 %>
-		</table>
+		</div>
 	</div>
 	<div class="page-footer">Copyright: mysns.com, 202x</div>
 </body>

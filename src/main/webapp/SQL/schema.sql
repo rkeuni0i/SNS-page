@@ -80,6 +80,32 @@ CREATE TABLE IF NOT EXISTS feed (
         ON UPDATE CASCADE
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
+-- 팔로우 관계. docs/ERD.md '확장 시 설계' 절의 설계를 그대로 구현한다.
+-- follower_id 가 followee_id 를 팔로우한다는 의미로, (follower_id, followee_id)
+-- 복합 PK를 두어 "같은 관계를 두 번 맺는" 중복을 DB 수준에서 차단한다.
+-- 애플리케이션에서 SELECT 후 INSERT로 검사하면 동시 요청 시 경쟁 조건이
+-- 생기지만(예: 더블클릭), 복합 PK는 그 경쟁을 DB가 최종적으로 막아준다.
+CREATE TABLE IF NOT EXISTS follow (
+    follower_id VARCHAR(128) NOT NULL COMMENT '팔로우하는 사람',
+    followee_id VARCHAR(128) NOT NULL COMMENT '팔로우당하는 사람',
+    ts          TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (follower_id, followee_id),
+    INDEX idx_follow_followee (followee_id),   -- "누가 나를 팔로우하나" 조회용
+    CONSTRAINT fk_follow_follower
+        FOREIGN KEY (follower_id) REFERENCES user (id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    CONSTRAINT fk_follow_followee
+        FOREIGN KEY (followee_id) REFERENCES user (id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+    -- "자기 자신 팔로우 금지"는 CHECK(follower_id <> followee_id)로 DB에도 두려 했으나,
+    -- 두 VARCHAR 컬럼을 비교하는 테이블 레벨 CHECK가 일부 MariaDB 버전(예: 10.11)에서
+    -- "ERROR 1901: Function or expression ... cannot be used in the CHECK clause"로
+    -- 거부된다. 이식성을 위해 이 검증은 FollowService.follow()의 애플리케이션 계층에서만
+    -- 수행한다 — 복합 PK(중복 방지)와 FK(존재하지 않는 회원 방지)는 그대로 DB가 지킨다.
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
 
 -- ------------------------------------------------------------
 --  정규화 점검 및 반정규화 제안

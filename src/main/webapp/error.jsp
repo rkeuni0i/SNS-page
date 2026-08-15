@@ -18,11 +18,12 @@
 	<title>MySNS - 오류</title>
 </head>
 <body>
-	<div class="page-hdr">MySNS</div>
+	<div class="page-hdr"><a href="main.jsp">MySNS</a></div>
 	<div class="page-body">
-		<p align="center"><br><%= userMessage %><br><br>
+		<div class="message-card is-error">
+			<p><%= userMessage %></p>
 			<a href="main.jsp"><button type="button">메인으로</button></a>
-		</p>
+		</div>
 	</div>
 	<div class="page-footer">Copyright: mysns.com, 202x</div>
 </body>

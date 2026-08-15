@@ -1,11 +1,57 @@
+/* ============================================================
+   MySNS 디자인 시스템
+   - 기존 클래스명(.page-hdr, .page-body, .section, .pad-24, .mtop-*, .button)은
+     그대로 유지해 JSP/HTML의 마크업을 크게 바꾸지 않아도 되도록 했습니다.
+   - 새로 추가한 클래스: .container, .card, .btn*, .feed-*, .user-row, .avatar,
+     .message-card, .empty-state
+   ============================================================ */
+
+:root {
+	--primary: #8B5CF6;
+	--primary-dark: #7C3AED;
+	--primary-soft: #F3EEFF;
+	--danger: #E11D48;
+	--bg: #F5F6FA;
+	--card-bg: #FFFFFF;
+	--border: #E4E6EF;
+	--text: #1F2233;
+	--text-muted: #767A8A;
+	--radius-lg: 16px;
+	--radius-md: 10px;
+	--shadow-sm: 0 1px 2px rgba(20, 20, 43, 0.06);
+	--shadow-md: 0 4px 16px rgba(20, 20, 43, 0.08);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+	height: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	background-color: var(--bg);
+	font-size: 16px;
+	line-height: 1.5;
+	color: var(--text);
+	font-family: 'Pretendard', 'Malgun Gothic', -apple-system, 'Segoe UI', Arial, sans-serif;
+	-webkit-font-smoothing: antialiased;
+}
+
+a { text-decoration: none; color: inherit; }
+
+/* ---------- 레이아웃 유틸리티 (기존 유지) ---------- */
+
 .section {
 	float: left;
 	width: 100%;
 	box-sizing: border-box;
-	}
+}
 .pad-16 { padding: 0 16px; }
 .pad-24 { padding: 0 24px; }
 .pad-32 { padding: 0 32px; }
+.pad-4 { padding: 0 4px; }
 .mtop-10 { margin-top: 10px; }
 .mtop-20 { margin-top: 20px; }
 .mtop-30 { margin-top: 30px; }
@@ -13,57 +59,128 @@
 .mbot-20 { margin-bottom: 20px; }
 .mbot-30 { margin-bottom: 30px; }
 
-body {
-	height: 100%;
-	margin: 0px; padding: 0px;
-	background-color: white;
-	font-size: 16px;
-	font-family: 'MalgunGothic', 'Arial'; 
-	}
+/* ---------- 헤더 / 푸터 ---------- */
+
 .page-hdr {
 	z-index: 10;
 	position: fixed;
-	left: 0px; top: 0px;
-	width: 100%; height: 54px;
-	line-height: 54px;
-	text-align: center; 
-	font-size: 1.1em;
-	font-weight: bold;
-	background-color: #FF4023;
-	color: white;
-	}
+	left: 0; top: 0;
+	width: 100%; height: 56px;
+	line-height: 56px;
+	text-align: center;
+	font-size: 1.15em;
+	font-weight: 700;
+	letter-spacing: -0.02em;
+	background-color: var(--card-bg);
+	color: var(--primary);
+	border-bottom: 1px solid var(--border);
+	box-shadow: var(--shadow-sm);
+}
+.page-hdr a {
+	color: inherit;
+	cursor: pointer;
+}
+.page-hdr a:hover {
+	opacity: 0.8;
+}
 .page-footer {
 	z-index: 10;
 	position: fixed;
-	left: 0px; bottom: 0px;
-	width: 100%; height: 50px;
-	line-height: 50px;
-	text-align: center; 
-	font-size: 0.85em;
-	background-color: #f6f6f6;
-	color: #666;
-	}
+	left: 0; bottom: 0;
+	width: 100%; height: 48px;
+	line-height: 48px;
+	text-align: center;
+	font-size: 0.82em;
+	background-color: var(--card-bg);
+	color: var(--text-muted);
+	border-top: 1px solid var(--border);
+}
+
+/* ---------- 본문 컨테이너 ---------- */
+
 .page-body {
 	float: left;
 	width: 100%;
-	padding-top: 54px;
-	}
-.page-body input {
+	min-height: 100%;
+	padding: 72px 16px 64px;
+	box-sizing: border-box;
+}
+
+/* main.jsp / userList.jsp 등에서 쓰는 table 도 폭을 제한해 가운데 정렬한다 */
+.page-body table,
+.container {
+	width: 100%;
+	max-width: 480px;
+	margin: 0 auto;
+}
+.page-body form {
+	width: 100%;
+	max-width: 480px;
+	margin: 0 auto;
+	float: none;
+	display: block;
+}
+.page-body table { border-collapse: collapse; }
+
+/* 폼 화면(로그인/가입/글쓰기/탈퇴)의 .section 을 카드처럼 보이게 한다 */
+.page-body .section.pad-24,
+.page-body .section.pad-32 {
+	background-color: var(--card-bg);
+	border: 1px solid var(--border);
+	border-radius: var(--radius-lg);
+	box-shadow: var(--shadow-sm);
+	padding-top: 24px;
+	padding-bottom: 24px;
+}
+
+/* ---------- 입력 요소 ---------- */
+
+.page-body input,
+.page-body textarea {
 	float: left;
 	width: 100%;
 	padding: 0 16px;
 	box-sizing: border-box;
 	line-height: 46px;
-	font-size: 1.0em;
-	border: 1px solid #ddd;
-	border-radius: 4px;
+	font-size: 1em;
+	font-family: inherit;
+	color: var(--text);
+	background-color: #FBFBFD;
+	border: 1px solid var(--border);
+	border-radius: var(--radius-md);
 	outline: none;
-	}
-.page-body input[type=submit] {
-	background-color: white;
-	color: #D44010;
-	border: 1px solid #D44010;
-	}
+	transition: border-color .15s ease, background-color .15s ease;
+}
+.page-body input:focus,
+.page-body textarea:focus {
+	border-color: var(--primary);
+	background-color: var(--card-bg);
+}
+.page-body input::placeholder,
+.page-body textarea::placeholder {
+	color: #A7ABBD;
+}
+
+textarea {
+	height: 160px;
+	padding: 16px !important;
+	line-height: 1.5 !important;
+	resize: vertical;
+}
+
+input[type=file] {
+	padding: 8px 0 !important;
+	line-height: normal !important;
+	border: none !important;
+	background: transparent !important;
+	font-size: 0.9em;
+	color: var(--text-muted);
+}
+
+/* ---------- 버튼 ---------- */
+
+.page-body input[type=submit],
+.page-body button,
 .page-body .button {
 	float: left;
 	width: 100%;
@@ -71,8 +188,286 @@ body {
 	box-sizing: border-box;
 	line-height: 46px;
 	text-align: center;
-	background-color: white;
-	color: #D44010;
-	border: 1px solid #D44010;
-	border-radius: 4px;
-	}
+	font-size: 1em;
+	font-weight: 600;
+	cursor: pointer;
+	background-color: var(--primary);
+	color: #fff;
+	border: 1px solid var(--primary);
+	border-radius: var(--radius-md);
+	transition: background-color .15s ease, transform .05s ease;
+}
+.page-body input[type=submit]:hover,
+.page-body .button:hover {
+	background-color: var(--primary-dark);
+	border-color: var(--primary-dark);
+}
+.page-body input[type=submit]:active,
+.page-body .button:active {
+	transform: scale(0.99);
+}
+
+/* 헤더 안의 작은 버튼(글쓰기/로그아웃 등)은 아웃라인 스타일로 구분 */
+.feed-toolbar .feed-actions button,
+.feed-toolbar .feed-actions .button {
+	float: none !important;
+	display: inline-block;
+	width: auto !important;
+	flex: 0 0 auto;
+	white-space: nowrap;
+	line-height: 34px;
+	padding: 0 14px;
+	font-size: 0.85em;
+	font-weight: 600;
+	background-color: var(--card-bg);
+	color: var(--primary);
+	border: 1px solid var(--border);
+	border-radius: var(--radius-md);
+	box-shadow: none;
+}
+.feed-toolbar button:hover,
+.feed-toolbar .button:hover {
+	background-color: var(--primary-soft);
+	color: var(--primary-dark);
+	border-color: var(--primary-soft);
+}
+
+.desc {
+	float: left;
+	width: 100%;
+	color: var(--text-muted);
+	font-size: 0.88em;
+	line-height: 1.6;
+}
+
+/* ---------- 피드 화면(main.jsp) ---------- */
+
+.feed-toolbar {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	row-gap: 10px;
+	margin-bottom: 16px;
+}
+.feed-toolbar h1 {
+	margin: 0;
+	font-size: 1.05em;
+	font-weight: 700;
+	flex: 1 1 auto;
+	min-width: 0;
+}
+.feed-toolbar .feed-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	flex: 0 0 auto;
+}
+
+.feed-card {
+	background-color: var(--card-bg);
+	border: 1px solid var(--border);
+	border-radius: var(--radius-lg);
+	box-shadow: var(--shadow-sm);
+	padding: 18px 20px;
+	margin-bottom: 14px;
+}
+.feed-meta {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 10px;
+}
+.feed-author {
+	font-weight: 600;
+	font-size: 0.92em;
+	color: var(--text);
+}
+.feed-time {
+	font-size: 0.8em;
+	color: var(--text-muted);
+}
+.feed-content {
+	font-size: 0.98em;
+	line-height: 1.6;
+	white-space: pre-line;
+	word-break: break-word;
+}
+.feed-image {
+	display: block;
+	max-width: 100%;
+	border-radius: var(--radius-md);
+	margin-bottom: 12px;
+}
+
+.empty-state {
+	text-align: center;
+	color: var(--text-muted);
+	font-size: 0.92em;
+	padding: 48px 16px;
+	background-color: var(--card-bg);
+	border: 1px dashed var(--border);
+	border-radius: var(--radius-lg);
+}
+
+/* ---------- 가입자 목록(userList.jsp) ---------- */
+
+.user-list-title {
+	font-size: 1.05em;
+	font-weight: 700;
+	margin: 0 0 16px;
+}
+.user-row {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	background-color: var(--card-bg);
+	border: 1px solid var(--border);
+	border-radius: var(--radius-lg);
+	box-shadow: var(--shadow-sm);
+	padding: 14px 18px;
+	margin-bottom: 10px;
+	transition: border-color .15s ease, box-shadow .15s ease;
+}
+.user-row:hover {
+	border-color: var(--primary);
+	box-shadow: var(--shadow-md);
+}
+.avatar {
+	flex: 0 0 auto;
+	width: 40px; height: 40px;
+	border-radius: 50%;
+	background-color: var(--primary-soft);
+	color: var(--primary-dark);
+	font-weight: 700;
+	font-size: 0.95em;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+.user-row .user-info {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+.user-row .user-name {
+	font-weight: 600;
+	font-size: 0.96em;
+}
+.user-row .user-id {
+	font-size: 0.82em;
+	color: var(--text-muted);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.user-row .user-joined {
+	flex: 0 0 auto;
+	font-size: 0.78em;
+	color: var(--text-muted);
+}
+
+/* ---------- 안내/에러 메시지 카드 (login.jsp 등의 결과 문구) ---------- */
+
+.message-card {
+	max-width: 420px;
+	margin: 40px auto 0;
+	background-color: var(--card-bg);
+	border: 1px solid var(--border);
+	border-radius: var(--radius-lg);
+	box-shadow: var(--shadow-sm);
+	padding: 40px 28px;
+	text-align: center;
+}
+.message-card p {
+	margin: 0 0 20px;
+	font-size: 1em;
+	color: var(--text);
+	line-height: 1.6;
+}
+.message-card.is-error p { color: var(--danger); }
+.message-card button,
+.message-card .button {
+	display: inline-block;
+	width: auto;
+	float: none;
+	padding: 0 20px;
+}
+
+/* ---------- 프로필 / 마이페이지 (profile.jsp) ---------- */
+
+.feed-author {
+	transition: color .15s ease;
+}
+.feed-author:hover {
+	color: var(--primary);
+	text-decoration: underline;
+}
+
+.profile-card {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+	background-color: var(--card-bg);
+	border: 1px solid var(--border);
+	border-radius: var(--radius-lg);
+	box-shadow: var(--shadow-sm);
+	padding: 32px 24px 24px;
+	margin-bottom: 20px;
+}
+.profile-avatar {
+	width: 64px; height: 64px;
+	font-size: 1.4em;
+	margin-bottom: 14px;
+}
+.profile-name {
+	font-size: 1.15em;
+	font-weight: 700;
+}
+.profile-id {
+	font-size: 0.88em;
+	color: var(--text-muted);
+	margin-top: 2px;
+}
+.profile-joined {
+	font-size: 0.8em;
+	color: var(--text-muted);
+	margin-top: 8px;
+}
+.profile-stats {
+	display: flex;
+	gap: 32px;
+	margin-top: 20px;
+}
+.profile-stat {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+.profile-stat .stat-num {
+	font-size: 1.1em;
+	font-weight: 700;
+	color: var(--text);
+}
+.profile-stat .stat-label {
+	font-size: 0.78em;
+	color: var(--text-muted);
+	margin-top: 2px;
+}
+.profile-actions {
+	margin-top: 22px;
+	width: 100%;
+	max-width: 220px;
+}
+.profile-actions button {
+	float: none;
+	width: 100%;
+}
+.profile-actions button.btn-outline {
+	background-color: var(--card-bg);
+	color: var(--primary);
+	border: 1px solid var(--primary);
+}
+.profile-actions button.btn-outline:hover {
+	background-color: var(--primary-soft);
+}

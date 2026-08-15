@@ -11,17 +11,38 @@
 	String upass2 = request.getParameter("ps2");   // 예전에는 폼에만 있고 서버에서 검사하지 않았다
 	String uname = request.getParameter("name");
 
+	boolean success;
 	String message;
+	String backHref;
 	try {
 		new UserService().signUp(uid, upass, upass2, uname);
+		success = true;
 		message = "회원가입이 완료되었습니다.";
-		out.print("<p align=center><br>" + message + "<br><br>"
-			+ "<a href='login.html'><button>로그인하기</button></a></p>");
+		backHref = "login.html";
 	} catch (DuplicateUserException e) {
-		out.print("<p align=center><br>이미 가입한 회원입니다.<br><br>"
-			+ "<a href='signup.html'><button>돌아가기</button></a></p>");
+		success = false;
+		message = "이미 가입한 회원입니다.";
+		backHref = "signup.html";
 	} catch (ValidationException e) {
-		out.print("<p align=center><br>" + HtmlEscaper.escape(e.getMessage()) + "<br><br>"
-			+ "<a href='signup.html'><button>돌아가기</button></a></p>");
+		success = false;
+		message = HtmlEscaper.escape(e.getMessage());
+		backHref = "signup.html";
 	}
 %>
+<html>
+<head>
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="css/core.css">
+	<title>MySNS 회원가입</title>
+</head>
+<body>
+	<div class="page-hdr"><a href="main.jsp">MySNS</a></div>
+	<div class="page-body">
+		<div class="message-card<%= success ? "" : " is-error" %>">
+			<p><%= message %></p>
+			<a href="<%= backHref %>"><button type="button"><%= success ? "로그인하기" : "돌아가기" %></button></a>
+		</div>
+	</div>
+	<div class="page-footer">Copyright: mysns.com, 202x</div>
+</body>
+</html>

@@ -19,6 +19,7 @@
 
 	String ucon = null, ufname = null;
 	byte[] ufile = null;
+	String errorMessage = null;
 
 	DiskFileItemFactory factory = new DiskFileItemFactory();
 	ServletFileUpload sfu = new ServletFileUpload(factory);
@@ -46,13 +47,27 @@
 		return;
 
 	} catch (ValidationException e) {
-		out.print("<p align=center><br>" + HtmlEscaper.escape(e.getMessage()) + "<br><br>"
-			+ "<a href='feedAdd.html'><button>돌아가기</button></a></p>");
+		errorMessage = HtmlEscaper.escape(e.getMessage());
 	} catch (java.io.IOException e) {
-		out.print("<p align=center><br>" + HtmlEscaper.escape(e.getMessage()) + "<br><br>"
-			+ "<a href='feedAdd.html'><button>돌아가기</button></a></p>");
+		errorMessage = HtmlEscaper.escape(e.getMessage());
 	} catch (org.apache.commons.fileupload.FileUploadException e) {
-		out.print("<p align=center><br>업로드 용량 제한을 초과했습니다.<br><br>"
-			+ "<a href='feedAdd.html'><button>돌아가기</button></a></p>");
+		errorMessage = "업로드 용량 제한을 초과했습니다.";
 	}
 %>
+<html>
+<head>
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="css/core.css">
+	<title>MySNS</title>
+</head>
+<body>
+	<div class="page-hdr"><a href="main.jsp">MySNS</a></div>
+	<div class="page-body">
+		<div class="message-card is-error">
+			<p><%= errorMessage %></p>
+			<a href="feedAdd.html"><button type="button">돌아가기</button></a>
+		</div>
+	</div>
+	<div class="page-footer">Copyright: mysns.com, 202x</div>
+</body>
+</html>

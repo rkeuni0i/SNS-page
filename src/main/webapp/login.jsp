@@ -8,6 +8,7 @@
 	request.setCharacterEncoding("utf-8");
 	String uid = request.getParameter("id");
 	String upass = request.getParameter("ps");
+	String errorMessage = null;
 
 	try {
 		User user = new UserService().login(uid, upass);
@@ -24,13 +25,27 @@
 		response.sendRedirect("main.jsp");
 		return;
 	} catch (UserNotFoundException e) {
-		out.print("<p align=center><br>아이디가 존재하지 않습니다.<br><br>"
-			+ "<a href='login.html'><button>돌아가기</button></a></p>");
+		errorMessage = "아이디가 존재하지 않습니다.";
 	} catch (InvalidCredentialsException e) {
-		out.print("<p align=center><br>패스워드가 일치하지 않습니다.<br><br>"
-			+ "<a href='login.html'><button>돌아가기</button></a></p>");
+		errorMessage = "패스워드가 일치하지 않습니다.";
 	} catch (ValidationException e) {
-		out.print("<p align=center><br>" + util.HtmlEscaper.escape(e.getMessage()) + "<br><br>"
-			+ "<a href='login.html'><button>돌아가기</button></a></p>");
+		errorMessage = util.HtmlEscaper.escape(e.getMessage());
 	}
 %>
+<html>
+<head>
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="css/core.css">
+	<title>MySNS</title>
+</head>
+<body>
+	<div class="page-hdr"><a href="main.jsp">MySNS</a></div>
+	<div class="page-body">
+		<div class="message-card is-error">
+			<p><%= errorMessage %></p>
+			<a href="login.html"><button type="button">돌아가기</button></a>
+		</div>
+	</div>
+	<div class="page-footer">Copyright: mysns.com, 202x</div>
+</body>
+</html>

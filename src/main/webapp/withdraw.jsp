@@ -15,17 +15,40 @@
 	}
 	String upass = request.getParameter("ps");
 
+	boolean success;
+	String message;
+	String backHref;
 	try {
 		new UserService().withdraw(uid, upass);
 		session.invalidate();
-		out.print("<p align=center><br>회원 탈퇴가 완료되었습니다.<br><br>"
-			+ "<a href='login.html'><button>처음으로</button></a></p>");
+		success = true;
+		message = "회원 탈퇴가 완료되었습니다.";
+		backHref = "login.html";
 	} catch (InvalidCredentialsException e) {
-		out.print("<p align=center><br>비밀번호가 일치하지 않습니다.<br><br>"
-			+ "<a href='withdraw.html'><button>돌아가기</button></a></p>");
+		success = false;
+		message = "비밀번호가 일치하지 않습니다.";
+		backHref = "withdraw.html";
 	} catch (UserNotFoundException e) {
 		session.invalidate();
-		out.print("<p align=center><br>존재하지 않는 회원입니다.<br><br>"
-			+ "<a href='login.html'><button>처음으로</button></a></p>");
+		success = false;
+		message = "존재하지 않는 회원입니다.";
+		backHref = "login.html";
 	}
 %>
+<html>
+<head>
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="css/core.css">
+	<title>MySNS 회원탈퇴</title>
+</head>
+<body>
+	<div class="page-hdr"><a href="main.jsp">MySNS</a></div>
+	<div class="page-body">
+		<div class="message-card<%= success ? "" : " is-error" %>">
+			<p><%= message %></p>
+			<a href="<%= backHref %>"><button type="button"><%= success ? "처음으로" : "돌아가기" %></button></a>
+		</div>
+	</div>
+	<div class="page-footer">Copyright: mysns.com, 202x</div>
+</body>
+</html>
