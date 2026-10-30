@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: mysns
+  datasource:
+    # 개발 DB는 MariaDB 11. characterEncoding을 빼면 한글이 '?'로 저장될 수 있다.
+    url: ${DB_URL:jdbc:mariadb://localhost:3306/mysns?useUnicode=true&characterEncoding=UTF-8}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD}
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 10MB
+
+server:
+  # 8080은 로컬의 다른 프로그램(Oracle XDB)이 쓰고 있어 8081을 기본값으로 한다.
+  port: ${SERVER_PORT:8081}
+
+mysns:
+  jwt:
+    # 32바이트 이상. 예) openssl rand -base64 48  (코드·저장소에 넣지 말고 환경변수로만 주입)
+    secret: ${JWT_SECRET:}
+    access-ttl: 15m
+    refresh-ttl: 7d
+    # HTTPS로 배포하면 true (refresh 쿠키에 Secure 플래그)
+    cookie-secure: ${COOKIE_SECURE:false}
+  upload-dir: ${UPLOAD_DIR:./uploads}

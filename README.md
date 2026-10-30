@@ -1,12 +1,90 @@
 # mysns
 
-> JSP / Servlet + 순수 JDBC로 구현한 미니 SNS 서비스
+> 회원가입 · 피드(이미지) · 팔로우를 갖춘 미니 SNS — **Spring Boot REST API + React**
 
-프레임워크 없이 `DataSource`, `PreparedStatement`, `HttpSession`만으로 웹 애플리케이션의 동작 원리를 직접 구현해 본 학습 프로젝트입니다. 회원가입·로그인·탈퇴와 텍스트/이미지 피드 작성·조회 기능을 제공합니다.
+JSP/Servlet + 순수 JDBC로 만든 학습용 프로젝트(v1)를 **Spring Boot 기반 REST API와 React 화면(v2)** 으로 옮겼습니다. 도메인 규칙과 DB 스키마는 그대로 이어받고, 인증을 세션에서 **Spring Security + JWT**로, 비밀번호 해싱을 **BCrypt**로 바꿨습니다.
 
-**기술 스택** — Java 17 · Jakarta Servlet 4.0 (javax) · Apache Tomcat 9 · MariaDB 11 / MySQL 8 (InnoDB) · commons-fileupload 1.3
+| | v1 (`src/`) | v2 (`mysns-spring/`) |
+|---|---|---|
+| 서버 | JSP / Servlet, Tomcat 9 | Spring Boot 4, 내장 Tomcat |
+| 화면 | JSP 스크립트릿 | React 19 + Vite (SPA) |
+| DB 접근 | 순수 JDBC + 직접 만든 ConnectionPool | JdbcTemplate + HikariCP |
+| 인증 | `HttpSession` | Spring Security + JWT (Access/Refresh, rotation) |
+| 비밀번호 | PBKDF2 직접 구현 | BCrypt (기존 계정은 로그인 시 자동 전환) |
+| API 문서 | 없음 | Swagger UI (springdoc) |
+| 테스트 | 없음 | JUnit 5 + Mockito (16개) |
+
+**기술 스택** — Java 21 · Spring Boot 4.1 · Spring Security · jjwt · JdbcTemplate · MariaDB 11 / MySQL 8 · React 19 · Vite · springdoc-openapi
+
+> 실행 방법·환경변수·API 목록은 **[mysns-spring/README.md](mysns-spring/README.md)** 에 있습니다.
 
 ---
+
+## v2 아키텍처
+
+```
+ React (SPA)  ── fetch ──▶  Spring Security 필터 체인
+                              │  JwtAuthenticationFilter: Authorization: Bearer 검증
+                              ▼
+                            Controller   요청/응답 변환, @Valid 검증, HTTP 상태 코드
+                              ▼
+                            Service      도메인 규칙(중복 가입, 비밀번호 검증, 토큰 발급·회전)
+                              ▼
+                            Repository   JdbcTemplate, SQL 그대로
+                              ▼
+                            MariaDB / MySQL
+```
+
+```
+mysns-spring/src/main/java/com/mysns
+├── controller/   Auth · User · Feed · Follow · Spa, GlobalExceptionHandler
+├── service/      AuthService · UserService · FeedService · FollowService · FileStorageService
+├── repository/   User · Feed · Follow · RefreshToken
+├── security/     SecurityConfig, JwtProvider, JwtAuthenticationFilter, JwtProperties
+├── dto/          요청/응답 record (비밀번호 해시는 응답에 포함하지 않음)
+├── domain/       User, Feed
+├── exception/    도메인 예외 → HTTP 상태 매핑
+└── util/         PasswordUtil (레거시 PBKDF2 검증 전용)
+```
+
+## v2 인증 설계
+
+| | 내용 |
+|---|---|
+| Access 토큰 | JWT(HS256) 15분. 응답 본문으로 받고 `Authorization: Bearer`로 전송. React는 **메모리에만** 보관(XSS로 localStorage가 털리는 것을 피함) |
+| Refresh 토큰 | JWT 7일. **HttpOnly + SameSite=Strict 쿠키**(경로 `/api/auth`)로만 전달. jti를 DB(`refresh_token`)에 저장 |
+| Rotation | 재발급할 때마다 기존 토큰을 `DELETE ... WHERE jti=? AND expires_at > NOW()` 한 문장으로 소비 → 같은 토큰을 동시에 써도 한 요청만 성공, 탈취된 토큰의 재사용 차단 |
+| 즉시 무효화 | 로그아웃·탈퇴 시 DB에서 지워 서버에서 바로 폐기(순수 stateless JWT의 약점 보완). 탈퇴는 FK CASCADE |
+| 토큰 혼용 방지 | `type` 클레임으로 access/refresh 구분 — refresh 토큰을 Bearer로 보내면 거부 |
+| 접근 제어 | 가입·로그인·재발급·정적 파일·Swagger만 공개, 나머지 `/api/**`는 **기본 차단**(새 API가 실수로 열리지 않음) |
+| 계정 열거 방지 | 없는 아이디와 틀린 비밀번호를 같은 401로 응답하고, 없는 아이디에도 BCrypt 비교를 수행해 응답 시간 차이를 줄임 |
+| 프론트 재발급 | 서버가 `WWW-Authenticate: Bearer`를 단 401을 줄 때만 재발급 후 1회 재시도(비밀번호 오류 401과 구분). 동시 요청은 재발급을 한 번만 보냄 |
+
+### PBKDF2 → BCrypt 점진적 마이그레이션
+
+평문 비밀번호는 로그인할 때만 알 수 있어 DB를 일괄 변환할 수 없습니다. 그래서 `salt` 컬럼이 채워진 계정(= 기존 PBKDF2)은 PBKDF2로 검증하고, **검증에 성공하는 순간 BCrypt로 다시 저장하며 salt를 NULL로 비웁니다.** 가입한 적 없는 사용자는 한 번도 건드리지 않으므로 서비스를 멈출 필요가 없습니다. 기존 DB는 `mysns-spring/db/migration_jwt_bcrypt.sql`(데이터 삭제 없음, 재실행 안전)로 올립니다.
+
+## v2에서 의식적으로 택한 트레이드오프
+
+- **JWT는 서버가 access 토큰을 취소할 수 없습니다.** 탈퇴·로그아웃 직후에도 access 토큰은 최대 15분 유효합니다. 짧은 수명 + DB로 관리되는 refresh 토큰으로 완화했습니다.
+- **여러 탭이 동시에 재발급하면** rotation 때문에 한쪽이 실패할 수 있습니다(재로그인으로 복구). 유예 시간(grace period)을 두는 것이 다음 개선점입니다.
+- **서버 1대·웹 클라이언트 하나** 라면 세션이 더 단순합니다. JWT는 서버 확장(Cloud Run 등)과 모바일 클라이언트를 염두에 둔 선택입니다.
+- `/images/**`는 `<img>`가 Authorization 헤더를 보낼 수 없어 공개이며, 파일명이 UUID라 추측할 수 없다는 점에 기대고 있습니다.
+
+## v2 알려진 한계 / 다음 단계
+
+- Docker + GCP(Cloud Run 또는 VM) 배포, `COOKIE_SECURE=true`(HTTPS) 전환
+- 피드 삭제·수정, 좋아요·댓글 없음
+- 통합 테스트(Testcontainers)와 프론트 테스트 없음 — 현재는 단위 테스트와 수동 E2E 확인
+- 이미지 파일이 로컬 디스크에 저장됨(Cloud Storage 등으로 분리 필요)
+
+---
+
+# v1: JSP / Servlet 구현 기록
+
+> 아래는 프레임워크 없이 `DataSource`, `PreparedStatement`, `HttpSession`만으로 구현했던 v1(`src/`)의 설계·개선·트러블슈팅 기록입니다. v2에서도 DB 스키마와 도메인 규칙은 이 설계를 이어받았습니다.
+
+**기술 스택(v1)** — Java 17 · Jakarta Servlet 4.0 (javax) · Apache Tomcat 9 · MariaDB 11 / MySQL 8 (InnoDB) · commons-fileupload 1.3
 
 ## 스크린샷
 
