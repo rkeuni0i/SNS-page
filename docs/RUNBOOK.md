@@ -130,10 +130,10 @@ Eclipse에서 Tomcat 설치 위치를 모르겠다면: **Window → Preferences 
 
 ## 3. DB 접속 정보 맞추기
 
-`src/main/webapp/META-INF/context.xml` 을 열어 `username` / `password` 를 본인 MySQL 계정으로 수정합니다. 현재는 `root` / `1111` 로 되어 있습니다.
+`src/main/webapp/META-INF/context.xml.example` 을 같은 폴더의 `context.xml` 로 복사한 뒤, `username` / `password` 를 본인 MySQL 계정으로 수정합니다. (`context.xml` 은 `.gitignore` 로 커밋에서 제외됩니다.)
 
 ```xml
-username="root"
+username="본인_계정"
 password="본인_비밀번호"
 ```
 

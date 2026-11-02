@@ -502,7 +502,7 @@ mysql -u root -p < seed.sql
 
 ### 3. 커넥션 풀 설정
 
-`src/main/webapp/META-INF/context.xml`의 계정 정보를 환경에 맞게 수정합니다.
+`src/main/webapp/META-INF/context.xml.example`을 같은 폴더의 `context.xml`로 복사한 뒤, `username` / `password`를 본인 DB 계정으로 수정합니다. (`context.xml`은 `.gitignore`로 커밋에서 제외됩니다.)
 
 > **참고** — MySQL Connector/J 8부터 `com.mysql.jdbc.Driver`는 폐기되었습니다. 드라이버 8.x를 쓴다면 `com.mysql.cj.jdbc.Driver`로 바꾸고, JAR을 Tomcat의 `lib/` 폴더에 두어야 합니다(웹앱의 `WEB-INF/lib`가 아닙니다).
 

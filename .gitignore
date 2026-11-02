@@ -1,0 +1,21 @@
+# Eclipse
+.classpath
+.project
+.settings/
+
+# Build output
+build/
+bin/
+target/
+*.class
+
+# 작업용 임시/백업 폴더
+_backup_*/
+_to_delete/
+
+# 로컬 DB 접속 정보 (context.xml.example 을 복사해서 사용)
+src/main/webapp/META-INF/context.xml
+
+# OS / IDE
+.DS_Store
+.idea/
